@@ -89,9 +89,13 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
         fragment.startActivityForResult(intent, requestCode);
     }
 
+    public static Intent createIntent(@NonNull Context context) {
+        return new Intent(context, GalleryActivity.class);
+    }
+
     @NonNull
     private static Intent buildIntent(@NonNull Context context, @IntRange(from = 0) int maxSelection, List<Uri> selection, String[] mediaTypeFilter) {
-        Intent intent = new Intent(context, GalleryActivity.class);
+        Intent intent = createIntent(context);
         if (maxSelection > 0) {
             intent.putExtra(EXTRA_MAX_SELECTION, maxSelection);
         }
@@ -108,9 +112,9 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
         return data.getParcelableArrayListExtra(EXTRA_SELECTION);
     }
 
-    private GalleryFragment mFragment;
-    private ViewGroup mContentView;
-    private CounterFab mFab;
+    protected GalleryFragment mFragment;
+    protected ViewGroup mContentView;
+    protected CounterFab mFab;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
