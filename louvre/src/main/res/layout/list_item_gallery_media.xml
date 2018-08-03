@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/gallery_item_size"
+    android:layout_height="@dimen/gallery_item_media_size"
     android:clipChildren="false"
     android:transitionGroup="true"
     tools:targetApi="lollipop">
@@ -16,6 +16,9 @@
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
-    <include layout="@layout/checkbox" />
+    <include layout="@layout/checkbox"
+        android:layout_gravity="top|right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </FrameLayout>

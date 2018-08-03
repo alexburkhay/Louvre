@@ -135,6 +135,10 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
         return 0;
     }
 
+    public int getViewType() {
+        return mViewType;
+    }
+
     @Override
     public int getItemViewType(int position) {
         return mViewType;
@@ -154,9 +158,9 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull GalleryAdapter.ViewHolder holder, int position) {
         Uri data = getData(position);
-        String imageTransitionName = holder.itemView.getContext().getString(R.string.activity_gallery_image_transition, data.toString());
-        String checkboxTransitionName = holder.itemView.getContext().getString(R.string.activity_gallery_checkbox_transition, data.toString());
-        ViewCompat.setTransitionName(holder.mImageView, imageTransitionName);
+        //String imageTransitionName = holder.itemView.getContext().getString(R.string.activity_gallery_image_transition, data.toString());
+        //String checkboxTransitionName = holder.itemView.getContext().getString(R.string.activity_gallery_checkbox_transition, data.toString());
+        //ViewCompat.setTransitionName(holder.mImageView, imageTransitionName);
         Glide.with(holder.mImageView.getContext())
                 .load(data)
                 .apply(RequestOptions.skipMemoryCacheOf(true)
@@ -175,7 +179,7 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
         if (VIEW_TYPE_MEDIA == getItemViewType(position)) {
             MediaViewHolder viewHolder = (MediaViewHolder) holder;
-            ViewCompat.setTransitionName(viewHolder.mCheckView, checkboxTransitionName);
+            //ViewCompat.setTransitionName(viewHolder.mCheckView, checkboxTransitionName);
             viewHolder.mCheckView.setChecked(selected);
             holder.mImageView.setContentDescription(getLabel(position));
         } else {
@@ -264,6 +268,9 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     }
 
     private boolean isSelected(int position) {
+        if (VIEW_TYPE_MEDIA != getItemViewType(position))
+            return false;
+
         Uri data = getData(position);
         return mSelection.contains(data);
     }
