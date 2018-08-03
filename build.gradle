@@ -48,10 +48,10 @@ allprojects {
         allLicenses = ["Apache-2.0"]
 
         bintrayRepo = 'github'
-        group = 'com.github.andremion'
+        group = 'com.github.alexburkhay'
         artifact = 'louvre'
 
-        gitUrl = 'https://github.com/andremion/' + name
+        gitUrl = 'https://github.com/alexburkhay/' + name
         vcsUrl = gitUrl + '.git'
         issueTracker = gitUrl + '/issues'
 
