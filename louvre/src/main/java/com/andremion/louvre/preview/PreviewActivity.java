@@ -76,9 +76,9 @@ public class PreviewActivity extends AppCompatActivity implements MediaLoader.Ca
                 Pair.create(checkView, ViewCompat.getTransitionName(checkView)));
 
         //noinspection unchecked
-        ActivityOptionsCompat options = ActivityOptionsCompat
-                .makeSceneTransitionAnimation(activity, sharedElements);
-        ActivityCompat.startActivityForResult(activity, intent, requestCode, options.toBundle());
+        //ActivityOptionsCompat options = ActivityOptionsCompat
+        //        .makeSceneTransitionAnimation(activity, sharedElements);
+        ActivityCompat.startActivityForResult(activity, intent, requestCode, null);
     }
 
     @SafeVarargs

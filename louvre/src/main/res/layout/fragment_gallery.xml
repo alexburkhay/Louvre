@@ -18,7 +18,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:drawableTop="@drawable/ic_no_images"
         android:text="@string/activity_gallery_no_images"
         android:textAppearance="?textAppearanceSearchResultTitle"
         android:visibility="invisible"

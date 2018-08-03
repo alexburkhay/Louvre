@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/gallery_fab_margin"
+        android:visibility="gone"
         app:layout_behavior="com.andremion.louvre.util.FabBehavior"
         app:srcCompat="@drawable/ic_done_white_24dp" />
 

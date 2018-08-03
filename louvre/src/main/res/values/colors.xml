@@ -2,4 +2,6 @@
 <resources>
     <color name="gallery_bucket_text_background">#66000000</color>
     <color name="gallery_item_background">#ddd</color>
+    <color name="blue">#0074e5</color>
+    <color name="white">@android:color/white</color>
 </resources>

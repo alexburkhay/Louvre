@@ -19,6 +19,7 @@ package com.andremion.louvre.home;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -115,7 +118,11 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
         setContentView(R.layout.activity_gallery);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setupTransition();
+        ActionBar ab = getSupportActionBar();
+        setUpBackArrow(ab);
+        //setupTransition();
+        ab.setTitle("Gallery");
+        ab.setDisplayHomeAsUpEnabled(true);
 
         mContentView = (ViewGroup) findViewById(R.id.coordinator_layout);
 
@@ -138,6 +145,11 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
         } else {
             setActionBarTitle(savedInstanceState.getString(TITLE_STATE));
         }
+    }
+
+    protected void setUpBackArrow(@NonNull ActionBar ab){
+        final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_white_24dp);
+        ab.setHomeAsUpIndicator(upArrow);
     }
 
     private void setupTransition() {
@@ -182,7 +194,7 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
     @Override
     public void onBackPressed() {
         if (mFragment.onBackPressed()) {
-            resetActionBarTitle();
+            //resetActionBarTitle();
         } else {
             super.onBackPressed();
         }
@@ -238,6 +250,10 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
         mFab.setCount(count);
     }
 
+    public int getSelectionCount() {
+        return mFab != null ? mFab.getCount() : 0;
+    }
+
     @Override
     public void onMaxSelectionReached() {
         Snackbar.make(mContentView, R.string.activity_gallery_max_selection_reached, Snackbar.LENGTH_SHORT).show();
@@ -249,7 +265,7 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void setActionBarTitle(@Nullable CharSequence title) {
+    public void setActionBarTitle(@Nullable CharSequence title) {
         getSupportActionBar().setTitle(title);
     }
 

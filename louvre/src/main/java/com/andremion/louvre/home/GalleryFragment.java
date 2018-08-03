@@ -32,6 +32,7 @@ import android.support.v4.app.SharedElementCallback;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Transition;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,6 +41,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
+import android.widget.TextView;
 import com.andremion.louvre.R;
 import com.andremion.louvre.data.MediaLoader;
 import com.andremion.louvre.preview.PreviewActivity;
@@ -102,22 +104,68 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
         mMediaLoader.onAttach((FragmentActivity) context, this);
     }
 
+    private TextView badgeTextView;
+    private static int BADGE_ID = 111;
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.gallery_menu, menu);
+
+
+        badgeTextView = new TextView(getActivity());
+        badgeTextView.setTextColor(getResources().getColor(R.color.blue));
+        badgeTextView.setPadding(5, 0, 5, 0);
+        badgeTextView.setBackground(getResources().getDrawable(R.drawable.oval_badge_white));
+        badgeTextView.setTextSize(16);
+        badgeTextView.setMinWidth(getResources().getDimensionPixelSize(R.dimen.gallery_badge_min_size));
+        badgeTextView.setMinHeight(getResources().getDimensionPixelSize(R.dimen.gallery_badge_min_size));
+        badgeTextView.setGravity(Gravity.CENTER);
+        badgeTextView.setPadding(
+            getResources().getDimensionPixelSize(R.dimen.gallery_badge_padding), 0,
+            getResources().getDimensionPixelSize(R.dimen.gallery_badge_padding), 0);
+        menu.add(0, BADGE_ID, 0, "Count")
+            .setActionView(badgeTextView)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        inflater.inflate(R.menu.check_menu, menu);
+
+        //<TextView
+        //android:id="@+id/tv_count"
+        //android:layout_width="wrap_content"
+        //android:layout_height="wrap_content"
+        //android:minWidth="18dp"
+        //android:minHeight="18dp"
+        //android:layout_marginLeft="6dp"
+        //android:layout_marginBottom="2dp"
+        //android:background="@drawable/oval_badge_white"
+        //android:gravity="center"
+        //android:paddingLeft="1dp"
+        //android:paddingRight="1dp"
+        //android:maxLength="3"
+        //android:maxLines="1"
+        //tools:text="999"
+        //android:ellipsize="end"
+        //android:textColor="@color/blue"
+        //android:textSize="@dimen/font_mid_small"
+        //android:visibility="gone"
+        //tools:visibility="visible"
+        //style="@style/TextAppearance.Design.Tab"
+        //    />
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        boolean isMedia = mAdapter.getItemViewType(0) == GalleryAdapter.VIEW_TYPE_MEDIA;
-        MenuItem selectAll = menu.findItem(R.id.action_select_all);
-        selectAll.setVisible(isMedia);
-        MenuItem clear = menu.findItem(R.id.action_clear);
-        clear.setVisible(isMedia);
+        int count = ((GalleryActivity) getActivity()).getSelectionCount();
+        menu.findItem(R.id.menu_check).setVisible(count > 0);
+        menu.findItem(BADGE_ID).setVisible(count > 0);
+        badgeTextView.setText(count > 100 ? "99+" : count + "");
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
         if (item.getItemId() == R.id.action_select_all) {
             mAdapter.selectAll();
             return true;
@@ -126,11 +174,16 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
             mAdapter.clearSelection();
             return true;
         }
+        if (item.getItemId() == R.id.menu_check) {
+            ((GalleryActivity) getActivity()).onClick(null);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBucketLoadFinished(@Nullable Cursor data) {
+        mLayoutManager.setSpanCount(2);
         mAdapter.swapData(GalleryAdapter.VIEW_TYPE_BUCKET, data);
         getActivity().invalidateOptionsMenu();
         updateEmptyState();
@@ -138,6 +191,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
 
     @Override
     public void onMediaLoadFinished(@Nullable Cursor data) {
+        mLayoutManager.setSpanCount(3);
         mAdapter.swapData(GalleryAdapter.VIEW_TYPE_MEDIA, data);
         getActivity().invalidateOptionsMenu();
         updateEmptyState();
@@ -176,7 +230,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
             @Override
             public boolean onPreDraw() {
                 mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                int size = getResources().getDimensionPixelSize(R.dimen.gallery_item_size);
+                int size = getResources().getDimensionPixelSize(R.dimen.gallery_item_bucket_size);
                 int width = mRecyclerView.getMeasuredWidth();
                 int columnCount = width / (size + spacing);
                 mLayoutManager.setSpanCount(columnCount);
@@ -258,6 +312,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
     @Override
     public void onSelectionUpdated(int count) {
         mCallbacks.onSelectionUpdated(count);
+        getActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -277,6 +332,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
      */
     public boolean onBackPressed() {
         if (mShouldHandleBackPressed) {
+            ((GalleryActivity)getActivity()).setActionBarTitle("Gallery");
             loadBuckets();
             return true;
         }
