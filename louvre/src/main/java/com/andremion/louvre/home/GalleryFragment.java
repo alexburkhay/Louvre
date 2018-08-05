@@ -56,7 +56,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
 
     public interface Callbacks {
 
-        void onBucketClick(String label);
+        void onBucketClick( long bucketid, String label);
 
         void onMediaClick(@NonNull View imageView, View checkView, long bucketId, int position);
 
@@ -67,6 +67,10 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
         void onWillExceedMaxSelection();
     }
 
+    public static final String EXTRA_VIEW_TYPE = "extra_view_type";
+    public static final String EXTRA_BUCKET_ID = "extra_bucket_id";
+    public static final String EXTRA_BUCKET_NAME = "extra_bucket_name";
+
     private final MediaLoader mMediaLoader;
     private final GalleryAdapter mAdapter;
     private View mEmptyView;
@@ -74,6 +78,10 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
     private RecyclerView mRecyclerView;
     private Callbacks mCallbacks;
     private boolean mShouldHandleBackPressed;
+
+    private int mViewType = GalleryAdapter.VIEW_TYPE_BUCKET;
+    private long bucketid = MediaLoader.ALL_MEDIA_BUCKET_ID;
+    private String bucketname;
 
     public GalleryFragment() {
         mMediaLoader = new MediaLoader();
@@ -91,6 +99,15 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
         mAdapter.setMaxSelection(maxSelection);
     }
 
+    public int getMaxSelection() {
+        return mAdapter.getMaxSelection();
+    }
+
+    @NonNull
+    public String[] getMediaTypeFilter() {
+        return mMediaLoader.getFilters();
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -104,13 +121,19 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
         mMediaLoader.onAttach((FragmentActivity) context, this);
     }
 
+    @Override public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(EXTRA_VIEW_TYPE, mViewType);
+        outState.putLong(EXTRA_BUCKET_ID, bucketid);
+        outState.putString(EXTRA_BUCKET_NAME, bucketname);
+        super.onSaveInstanceState(outState);
+    }
+
     private TextView badgeTextView;
     private static int BADGE_ID = 111;
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-
         badgeTextView = new TextView(getActivity());
         badgeTextView.setTextColor(getResources().getColor(R.color.blue));
         badgeTextView.setPadding(5, 0, 5, 0);
@@ -118,6 +141,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
         badgeTextView.setTextSize(16);
         badgeTextView.setMinWidth(getResources().getDimensionPixelSize(R.dimen.gallery_badge_min_size));
         badgeTextView.setMinHeight(getResources().getDimensionPixelSize(R.dimen.gallery_badge_min_size));
+        badgeTextView.setAlpha(1.0f);
         badgeTextView.setGravity(Gravity.CENTER);
         badgeTextView.setPadding(
             getResources().getDimensionPixelSize(R.dimen.gallery_badge_padding), 0,
@@ -126,29 +150,10 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
             .setActionView(badgeTextView)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         inflater.inflate(R.menu.check_menu, menu);
+    }
 
-        //<TextView
-        //android:id="@+id/tv_count"
-        //android:layout_width="wrap_content"
-        //android:layout_height="wrap_content"
-        //android:minWidth="18dp"
-        //android:minHeight="18dp"
-        //android:layout_marginLeft="6dp"
-        //android:layout_marginBottom="2dp"
-        //android:background="@drawable/oval_badge_white"
-        //android:gravity="center"
-        //android:paddingLeft="1dp"
-        //android:paddingRight="1dp"
-        //android:maxLength="3"
-        //android:maxLines="1"
-        //tools:text="999"
-        //android:ellipsize="end"
-        //android:textColor="@color/blue"
-        //android:textSize="@dimen/font_mid_small"
-        //android:visibility="gone"
-        //tools:visibility="visible"
-        //style="@style/TextAppearance.Design.Tab"
-        //    />
+    public int getViewType() {
+        return mViewType;
     }
 
     @Override
@@ -163,7 +168,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            getActivity().onBackPressed();
             return true;
         }
         if (item.getItemId() == R.id.action_select_all) {
@@ -183,7 +188,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
 
     @Override
     public void onBucketLoadFinished(@Nullable Cursor data) {
-        mLayoutManager.setSpanCount(2);
+        mViewType = GalleryAdapter.VIEW_TYPE_BUCKET;
         mAdapter.swapData(GalleryAdapter.VIEW_TYPE_BUCKET, data);
         getActivity().invalidateOptionsMenu();
         updateEmptyState();
@@ -191,7 +196,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
 
     @Override
     public void onMediaLoadFinished(@Nullable Cursor data) {
-        mLayoutManager.setSpanCount(3);
+        mViewType = GalleryAdapter.VIEW_TYPE_MEDIA;
         mAdapter.swapData(GalleryAdapter.VIEW_TYPE_MEDIA, data);
         getActivity().invalidateOptionsMenu();
         updateEmptyState();
@@ -230,7 +235,9 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
             @Override
             public boolean onPreDraw() {
                 mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                int size = getResources().getDimensionPixelSize(R.dimen.gallery_item_bucket_size);
+                int size = getResources().getDimensionPixelSize(
+                    mViewType == GalleryAdapter.VIEW_TYPE_MEDIA ? R.dimen.gallery_item_media_size
+                        : R.dimen.gallery_item_bucket_size);
                 int width = mRecyclerView.getMeasuredWidth();
                 int columnCount = width / (size + spacing);
                 mLayoutManager.setSpanCount(columnCount);
@@ -241,6 +248,15 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
         if (savedInstanceState != null) {
             updateEmptyState();
         }
+        if (savedInstanceState == null)
+            savedInstanceState = getActivity().getIntent().getExtras();
+
+        if (savedInstanceState != null) {
+            mViewType = savedInstanceState.getInt(EXTRA_VIEW_TYPE, GalleryAdapter.VIEW_TYPE_BUCKET);
+            bucketid = savedInstanceState.getLong(EXTRA_BUCKET_ID, MediaLoader.ALL_MEDIA_BUCKET_ID);
+            bucketname = savedInstanceState.getString(EXTRA_BUCKET_NAME);
+        }
+        mLayoutManager.setSpanCount(mViewType == GalleryAdapter.VIEW_TYPE_MEDIA ? 3 : 2);
 
         return view;
     }
@@ -299,9 +315,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
 
     @Override
     public void onBucketClick(long bucketId, String label) {
-        mMediaLoader.loadByBucket(bucketId);
-        mCallbacks.onBucketClick(label);
-        mShouldHandleBackPressed = true;
+        mCallbacks.onBucketClick(bucketid, label);
     }
 
     @Override
@@ -331,17 +345,22 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
      * @return If this Fragment handled the back pressed callback
      */
     public boolean onBackPressed() {
-        if (mShouldHandleBackPressed) {
-            ((GalleryActivity)getActivity()).setActionBarTitle("Gallery");
-            loadBuckets();
-            return true;
-        }
+        //if (mShouldHandleBackPressed) {
+        //    ((GalleryActivity)getActivity()).setActionBarTitle("Gallery");
+        //    loadBuckets();
+        //    return true;
+        //}
         return false;
     }
 
     public void loadBuckets() {
         mMediaLoader.loadBuckets();
         mShouldHandleBackPressed = false;
+    }
+
+    public void loadByBucket() {
+        mMediaLoader.loadByBucket(bucketid);
+        mShouldHandleBackPressed = true;
     }
 
     public List<Uri> getSelection() {

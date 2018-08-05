@@ -48,7 +48,7 @@ public class MediaLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int BUCKET_LOADER = 1;
     private static final int MEDIA_LOADER = 2;
 
-    static final long ALL_MEDIA_BUCKET_ID = 0;
+    public static final long ALL_MEDIA_BUCKET_ID = 0;
     private static final String BUCKET_ID = MediaStore.Images.Media.BUCKET_ID;
 
     public interface Callbacks {
@@ -61,6 +61,8 @@ public class MediaLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     private FragmentActivity mActivity;
     private Callbacks mCallbacks;
     private String mTypeFilter;
+
+    private String[] filters;
 
     public MediaLoader() {
         // 1 means all media type.
@@ -120,7 +122,12 @@ public class MediaLoader implements LoaderManager.LoaderCallbacks<Cursor> {
         mCallbacks = null;
     }
 
+    public String[] getFilters() {
+        return filters;
+    }
+
     public void setMediaTypes(@NonNull String[] mediaTypes) {
+        filters = mediaTypes;
         StringBuilder filter = new StringBuilder();
         for (String type : mediaTypes) {
             if (filter.length() > 0) {

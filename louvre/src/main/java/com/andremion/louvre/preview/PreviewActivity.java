@@ -56,7 +56,7 @@ public class PreviewActivity extends AppCompatActivity implements MediaLoader.Ca
 
     private static final String EXTRA_BUCKET_ID = PreviewActivity.class.getPackage().getName() + ".extra.BUCKET_ID";
     private static final String EXTRA_POSITION = PreviewActivity.class.getPackage().getName() + ".extra.POSITION";
-    private static final String EXTRA_SELECTION = PreviewActivity.class.getPackage().getName() + ".extra.SELECTION";
+    public static final String EXTRA_SELECTION = PreviewActivity.class.getPackage().getName() + ".extra.SELECTION";
     private static final String EXTRA_MAX_SELECTION = PreviewActivity.class.getPackage().getName() + ".extra.MAX_SELECTION";
     private static final String EXTRA_MEDIA_TYPE_FILTER = PreviewActivity.class.getPackage().getName() + ".extra.MEDIA_TYPE_FILTER";
 

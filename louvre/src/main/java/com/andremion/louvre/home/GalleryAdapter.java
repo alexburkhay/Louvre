@@ -51,8 +51,8 @@ import java.util.List;
  */
 class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
-    static final int VIEW_TYPE_BUCKET = 0;
-    static final int VIEW_TYPE_MEDIA = 1;
+    public static final int VIEW_TYPE_BUCKET = 0;
+    public static final int VIEW_TYPE_MEDIA = 1;
 
     private static final String SELECTION_PAYLOAD = "selection";
     private static final float SELECTED_SCALE = .8f;
@@ -98,6 +98,10 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
     void setMaxSelection(@IntRange(from = 0) int maxSelection) {
         mMaxSelection = maxSelection;
+    }
+
+    public int getMaxSelection() {
+        return mMaxSelection;
     }
 
     public void setLayoutManager(@NonNull LinearLayoutManager layoutManager) {

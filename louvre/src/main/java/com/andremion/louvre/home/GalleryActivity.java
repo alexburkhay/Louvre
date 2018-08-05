@@ -55,6 +55,8 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
     private static final String TITLE_STATE = "title_state";
     private static final int PREVIEW_REQUEST_CODE = 0;
 
+    private static final int MEDIA_REQUEST_CODE = 123;
+
     /**
      * Start the Gallery Activity with additional launch information.
      *
@@ -108,6 +110,25 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
         return intent;
     }
 
+    public Intent createIntent() {
+        return new Intent(this, this.getClass());
+    }
+
+    @NonNull
+    private Intent buildIntent(@IntRange(from = 0) int maxSelection, List<Uri> selection, String[] mediaTypeFilter) {
+        Intent intent = createIntent();
+        if (maxSelection > 0) {
+            intent.putExtra(EXTRA_MAX_SELECTION, maxSelection);
+        }
+        if (selection != null) {
+            intent.putExtra(EXTRA_SELECTION, new LinkedList<>(selection));
+        }
+        if (mediaTypeFilter != null && mediaTypeFilter.length > 0) {
+            intent.putExtra(EXTRA_MEDIA_TYPE_FILTER, mediaTypeFilter);
+        }
+        return intent;
+    }
+
     public static List<Uri> getSelection(Intent data) {
         return data.getParcelableArrayListExtra(EXTRA_SELECTION);
     }
@@ -148,6 +169,7 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
             askForPermission();
         } else {
             setActionBarTitle(savedInstanceState.getString(TITLE_STATE));
+
         }
     }
 
@@ -185,7 +207,12 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
 
     @Override
     public void onPermissionGranted() {
-        mFragment.loadBuckets();
+        if (mFragment.getViewType() == GalleryAdapter.VIEW_TYPE_BUCKET) {
+            mFragment.loadBuckets();
+        } else {
+            setActionBarTitle(getIntent().getExtras().getString(GalleryFragment.EXTRA_BUCKET_NAME));
+            mFragment.loadByBucket();
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -200,6 +227,9 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
         if (mFragment.onBackPressed()) {
             //resetActionBarTitle();
         } else {
+            Intent intent = new Intent();
+            intent.putExtra(PreviewActivity.EXTRA_SELECTION, new LinkedList<>(mFragment.getSelection()));
+            setResult(RESULT_OK, intent);
             super.onBackPressed();
         }
     }
@@ -213,13 +243,18 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
     public void onClick(View v) {
         Intent data = new Intent();
         data.putExtra(EXTRA_SELECTION, (ArrayList<Uri>) mFragment.getSelection());
+        data.putExtra(EXTRA_SELECTION, (ArrayList<Uri>) mFragment.getSelection());
         setResult(RESULT_OK, data);
         finish();
     }
 
-    @Override
-    public void onBucketClick(String label) {
-        setActionBarTitle(label);
+    @Override public void onBucketClick(long bucketid, String label) {
+        //setActionBarTitle(label);
+        Intent intent = this.buildIntent(mFragment.getMaxSelection(), mFragment.getSelection(), mFragment.getMediaTypeFilter());
+        intent.putExtra(GalleryFragment.EXTRA_VIEW_TYPE, GalleryAdapter.VIEW_TYPE_MEDIA);
+        intent.putExtra(GalleryFragment.EXTRA_BUCKET_ID, bucketid);
+        intent.putExtra(GalleryFragment.EXTRA_BUCKET_NAME, label);
+        startActivityForResult(intent, MEDIA_REQUEST_CODE);
     }
 
     @Override
@@ -244,6 +279,11 @@ public class GalleryActivity extends StoragePermissionActivity implements Galler
 
         if (requestCode == PREVIEW_REQUEST_CODE) {
             mFragment.setSelection(PreviewActivity.getSelection(data));
+        } else if (requestCode == MEDIA_REQUEST_CODE) {
+            List<Uri> selection = PreviewActivity.getSelection(data);
+            if (selection == null)
+                selection = (List<Uri>) data.getExtras().get(EXTRA_SELECTION);
+            mFragment.setSelection(selection);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
