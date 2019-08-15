@@ -137,7 +137,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
         badgeTextView = new TextView(getActivity());
         badgeTextView.setTextColor(getResources().getColor(R.color.blue));
         badgeTextView.setPadding(5, 0, 5, 0);
-        badgeTextView.setBackground(getResources().getDrawable(R.drawable.oval_badge_white));
+        badgeTextView.setBackground(getResources().getDrawable(R.drawable.oval_badge_counter_white));
         badgeTextView.setTextSize(16);
         badgeTextView.setMinWidth(getResources().getDimensionPixelSize(R.dimen.gallery_badge_min_size));
         badgeTextView.setMinHeight(getResources().getDimensionPixelSize(R.dimen.gallery_badge_min_size));
