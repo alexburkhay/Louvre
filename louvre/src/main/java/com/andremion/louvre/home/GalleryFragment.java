@@ -320,7 +320,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
 
     @Override
     public void onMediaClick(View imageView, View checkView, long bucketId, int position) {
-        mCallbacks.onMediaClick(imageView, checkView, bucketId, position);
+        mCallbacks.onMediaClick(imageView, checkView, bucketid, position);
     }
 
     @Override

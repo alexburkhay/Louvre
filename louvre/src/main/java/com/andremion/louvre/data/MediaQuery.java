@@ -43,6 +43,7 @@ class MediaQuery {
     };
     static final String[] ALL_IMAGE_PROJECTION_Q = {
         MediaStore.Images.ImageColumns._ID,
+        MediaStore.Images.ImageColumns.BUCKET_ID,
         MediaStore.Images.ImageColumns.DISPLAY_NAME,
         MediaStore.Images.ImageColumns.DATA
     };
