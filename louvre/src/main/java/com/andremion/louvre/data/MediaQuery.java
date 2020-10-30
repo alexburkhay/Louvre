@@ -57,7 +57,7 @@ class MediaQuery {
     // Note that because there is a "(" and )" in the template, we use "1)" and "(1" to match it.
     //
     // *Hack pulled from https://android.googlesource.com/platform/packages/apps/Gallery2/+/android-4.4.2_r2/src/com/android/gallery3d/data/BucketHelper.java
-    static final String BUCKET_SELECTION = "1) GROUP BY (1";
+    static final String BUCKET_SELECTION = "1) GROUP BY (1"; //MediaStore.Images.Media.BUCKET_ID
     static final String BUCKET_SORT_ORDER = "MAX(" + MediaStore.Images.Media.DATE_TAKEN + ") DESC";
 
 }
