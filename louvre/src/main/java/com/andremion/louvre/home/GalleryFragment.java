@@ -315,7 +315,7 @@ public class GalleryFragment extends Fragment implements MediaLoader.Callbacks, 
 
     @Override
     public void onBucketClick(long bucketId, String label) {
-        mCallbacks.onBucketClick(bucketid, label);
+        mCallbacks.onBucketClick(bucketId, label);
     }
 
     @Override

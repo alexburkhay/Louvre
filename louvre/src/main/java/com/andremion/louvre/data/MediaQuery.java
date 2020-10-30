@@ -41,6 +41,11 @@ class MediaQuery {
             MediaStore.Images.ImageColumns.DISPLAY_NAME,
             MediaStore.Images.ImageColumns.DATA
     };
+    static final String[] ALL_IMAGE_PROJECTION_Q = {
+        MediaStore.Images.ImageColumns._ID,
+        MediaStore.Images.ImageColumns.DISPLAY_NAME,
+        MediaStore.Images.ImageColumns.DATA
+    };
     static final String MEDIA_SORT_ORDER = MediaStore.Images.Media.DATE_TAKEN + " DESC";
 
     static final String[] BUCKET_PROJECTION = {
@@ -59,5 +64,8 @@ class MediaQuery {
     // *Hack pulled from https://android.googlesource.com/platform/packages/apps/Gallery2/+/android-4.4.2_r2/src/com/android/gallery3d/data/BucketHelper.java
     static final String BUCKET_SELECTION = "1) GROUP BY (1"; //MediaStore.Images.Media.BUCKET_ID
     static final String BUCKET_SORT_ORDER = "MAX(" + MediaStore.Images.Media.DATE_TAKEN + ") DESC";
+
+    //static final String BUCKET_SELECTION_Q = "1) GROUP BY " + MediaStore.Images.ImageColumns.BUCKET_ID + ", (" + MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME; //MediaStore.Images.Media.BUCKET_ID
+    static final String BUCKET_SORT_ORDER_Q = MediaStore.Images.Media.DATE_TAKEN + " DESC";
 
 }

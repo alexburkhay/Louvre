@@ -19,6 +19,7 @@ package com.andremion.louvre.data;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.IntRange;
@@ -32,9 +33,11 @@ import android.support.v4.content.Loader;
 import com.andremion.louvre.R;
 
 import static com.andremion.louvre.data.MediaQuery.ALL_IMAGE_PROJECTION;
+import static com.andremion.louvre.data.MediaQuery.ALL_IMAGE_PROJECTION_Q;
 import static com.andremion.louvre.data.MediaQuery.BUCKET_PROJECTION;
 import static com.andremion.louvre.data.MediaQuery.BUCKET_SELECTION;
 import static com.andremion.louvre.data.MediaQuery.BUCKET_SORT_ORDER;
+import static com.andremion.louvre.data.MediaQuery.BUCKET_SORT_ORDER_Q;
 import static com.andremion.louvre.data.MediaQuery.GALLERY_URI;
 import static com.andremion.louvre.data.MediaQuery.IMAGE_PROJECTION;
 import static com.andremion.louvre.data.MediaQuery.MEDIA_SORT_ORDER;
@@ -72,20 +75,38 @@ public class MediaLoader implements LoaderManager.LoaderCallbacks<Cursor> {
     @Override
     public final Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == TIME_LOADER) {
-            return new CursorLoader(mActivity,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                return new CursorLoader(mActivity,
+                    GALLERY_URI,
+                    ALL_IMAGE_PROJECTION_Q,
+                    mTypeFilter,
+                    null,
+                    MEDIA_SORT_ORDER);
+            } else {
+                return new CursorLoader(mActivity,
                     GALLERY_URI,
                     ALL_IMAGE_PROJECTION,
                     mTypeFilter,
                     null,
                     MEDIA_SORT_ORDER);
+            }
         }
         if (id == BUCKET_LOADER) {
-            return new CursorLoader(mActivity,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                return new CursorLoader(mActivity,
+                    GALLERY_URI,
+                    BUCKET_PROJECTION,
+                    mTypeFilter,
+                    null,
+                    BUCKET_SORT_ORDER_Q);
+            } else {
+                return new CursorLoader(mActivity,
                     GALLERY_URI,
                     BUCKET_PROJECTION,
                     String.format("%s AND %s", mTypeFilter, BUCKET_SELECTION),
                     null,
                     BUCKET_SORT_ORDER);
+            }
         }
         // id == MEDIA_LOADER
         return new CursorLoader(mActivity,
